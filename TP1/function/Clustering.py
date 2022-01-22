@@ -50,7 +50,7 @@ def Visualisation_CAH(X, y, method = 'ward', metric = 'euclidian', seuil = 10, s
     plt.title('CAH. Visualisation des classes au seuil de ' + str(seuil))
     d = dendrogram(M,labels = list(y), 
                    orientation = 'right', 
-                   color_threshold = s)
+                   color_threshold = seuil)
     #print(np.round(M[:,2],2))
 
 def groupes(X, y, s):
