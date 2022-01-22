@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 from sklearn.cluster import  KMeans
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix
 
 # Classification Ascendante hiérarchique --------------------------------------------
 
@@ -133,7 +134,7 @@ def Kmeans(X, y,  n_init = 10, stand = False, val = False, n = 10):
         # Rq: La matrice fournie par confusion_matrix est carrée:
         #    On retire les lignes de zeros de conf_mat, dues au fait qu'il peut y avoir plus de classes que d'etiquettes
         #    Et de meme avec les colonnes s'il y a moins de classes
-        conf_mat =  confusion_matrix(labels,cl)
+        conf_mat =  confusion_matrix(y, yhat)
         conf_mat=conf_mat[np.sum(conf_mat,axis=1)>0,:]
         conf_mat=conf_mat[:,np.sum(conf_mat,axis=0)>0]
         print("Matrice de confusion:")
