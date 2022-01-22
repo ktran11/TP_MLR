@@ -12,9 +12,9 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import plot_confusion_matrix
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
-def Analyse_discriminante(X, y, quadratic = False, validation = False, n = 10):
+def Taux_erreur_analyse_discriminante(X, y, quadratic = False, validation = False, n = 10):
     """
-    Analyse discriminante, taux d'erreur
+    Taux d'erreur de l'analyse discriminante
 
     Parameters
     ----------
@@ -63,7 +63,7 @@ def Analyse_discriminante(X, y, quadratic = False, validation = False, n = 10):
         errl = sum(y != yhat) / len(y)
         print("Taux d'erreur: ", round(errl , 3))
 
-def Matrice_confusion(X, y, quadratic = False):
+def Matrice_confusion_analyse_discriminante(X, y, quadratic = False):
     """
     Matrice de confusion pour l'analyse discriminante 
 

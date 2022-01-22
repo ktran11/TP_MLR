@@ -46,7 +46,7 @@ def ACP(X,  stand = False):
     A = V.dot(np.diag(D)) #axes principaux
     return C, A, (U,D,VT), nk, sk
 
-def inertie(D):
+def Inertie(D):
     """
     Barplot de l'inertie en %
 
