@@ -46,7 +46,7 @@ def ACP(X,  stand = False):
     A = V.dot(np.diag(D)) #axes principaux
     return C, A, (U,D,VT), nk, sk
 
-def inertie(D):
+def Inertie(D):
     """
     Barplot de l'inertie en %
 
@@ -65,7 +65,7 @@ def inertie(D):
     plt.bar(np.arange(np.shape(D)[0])+1, 100*D**2/sum(D**2))
     plt.title('Inerties en %')
     
-def cercle_correlation(A, varbs, index1 = 0, index2 = 1):
+def Cercle_correlation(A, varbs, index1 = 0, index2 = 1):
     """
     Cree un cercle de correlation si on a des variables avec des noms
 
