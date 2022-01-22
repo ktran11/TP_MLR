@@ -5,6 +5,7 @@ Created on Sat Jan 22 11:00:28 2022
 
 @author: Agathe
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -82,7 +83,7 @@ def Matrice_confusion(X, y, quadratic = False):
         da = LinearDiscriminantAnalysis()
 
     da.fit(X,y)
-    plt.rcParams.update({'figure.figsize': (3,3),'font.size': 16})
+    plt.rcParams.update({'figure.figsize': (3,3),'font.size': 10})
     plot_confusion_matrix(da, X, y, cmap='YlOrBr', colorbar=False)  
     plt.rcdefaults() 
 
@@ -105,12 +106,8 @@ def Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 1):
     None.
 
     """
-    if (quadratic):
-        da = QuadraticDiscriminantAnalysis()
-    else:
-        da = LinearDiscriminantAnalysis()
-
-    C = da.fit_transform(X, y)
+    lda = LinearDiscriminantAnalysis()
+    C = lda.fit_transform(X, y)
     print(C.shape)
     plt.figure()
     vlab = np.unique(y)

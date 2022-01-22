@@ -36,7 +36,6 @@ def arbre(X, y, s):
                    color_threshold = s)
     #print(np.round(M[:,2],2))
 
-
 def groupes(X, y, s):
     """
     Récupération des groupes
@@ -86,8 +85,6 @@ def intraclasse(X, y):
                  np.flip(VI / max(VI), axis = 0))
         plt.xlabel("Nombre de classes")
         plt.ylabel("Variance intraclasse/variance totale")
-    
-
 
 def Kmeans(X, y, s):
     """
@@ -114,7 +111,6 @@ def Kmeans(X, y, s):
         print('Classe ' + str(k + 1).ljust(3,' ')+': ', end = '')
         print(*y[np.where(k_means.labels_==k)])
     
-
 def comparaisons_inerties(X, y, s):
     """
     Comparaison des inerties Kmeans et CAH

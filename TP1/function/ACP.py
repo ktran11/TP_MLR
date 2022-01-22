@@ -64,7 +64,35 @@ def inertie(D):
     plt.figure()
     plt.bar(np.arange(np.shape(D)[0])+1, 100*D**2/sum(D**2))
     plt.title('Inerties en %')
+
+def nbr_comp_inert(D,seuil = 95):
+    """
+    Nombre de composantes à prendre pour retrouver seuil % de l'information
+
+    Parameters
+    ----------
+    D : ndarray
+        Vecteur diagonal de SVD.
+    seuil : int, optional
+        Pourcentage. The default is 95.
+
+    Returns
+    -------
+    res : int
+        Pourcentage de l'information retrouvé.
+    k : int
+        Nombre de composantes pour retrouver ce pourcentage.
+
+    """
+    L =  100*D**2/sum(D**2)
+    res = 0
+    k = 0
+    while (res < seuil):
+        res += L[k]
+        k += 1
+    return res,k
     
+
 def cercle_correlation(A, varbs, index1 = 0, index2 = 1):
     """
     Cree un cercle de correlation si on a des variables avec des noms
