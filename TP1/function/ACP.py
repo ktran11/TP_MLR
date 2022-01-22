@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
-def ACP(X,  stand = False):
+def ACP_func(X,  stand = False):
     """
     Analyse par composantes principales
     
@@ -32,19 +32,15 @@ def ACP(X,  stand = False):
     """
     
     Xcopy = X.copy()
-    nk = 0
-    sk = 1
     if (stand):
         Std = StandardScaler()
         Xcopy = Std.fit_transform(Xcopy)
-        nk = Std.mean_
-        sk = Std.scale_
-    
+     
     (U,D,VT) = np.linalg.svd(Xcopy, full_matrices = False)
     V = VT.T
     C = U.dot(np.diag(D)) #composantes principales
     A = V.dot(np.diag(D)) #axes principaux
-    return C, A, (U,D,VT), nk, sk
+    return C, A, (U,D,VT)
 
 def Inertie(D):
     """
@@ -90,7 +86,7 @@ def nbr_comp_inert(D,seuil = 95):
     while (res < seuil):
         res += L[k]
         k += 1
-    return res,k
+    return round(res,3),k
     
 
 def cercle_correlation(A, varbs, index1 = 0, index2 = 1):

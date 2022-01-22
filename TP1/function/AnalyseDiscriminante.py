@@ -63,7 +63,7 @@ def Taux_erreur_analyse_discriminante(X, y, quadratic = False, validation = Fals
         errl = sum(y != yhat) / len(y)
         print("Taux d'erreur: ", round(errl , 3))
 
-def Matrice_confusion_analyse_discriminante(X, y, quadratic = False):
+def Matrice_confusion_analyse_discriminante(X, y, quadratic = False, validation = False):
     """
     Matrice de confusion pour l'analyse discriminante 
 
@@ -71,18 +71,33 @@ def Matrice_confusion_analyse_discriminante(X, y, quadratic = False):
     ----------
     X : DONNÉES.
     y : LABELS.
+    quadratic = BOOLÉEN, optional
+        True si analyse discriminant quadratique. The default is False.
+    validation : BOOLÉEN, optional
+        True si analyse avec validation croisée. The default is False.
 
     Returns
     -------
     None.
 
     """
+    Xcopy = X.copy()
+    ycopy = y.copy()
     if (quadratic):
         da = QuadraticDiscriminantAnalysis()
     else:
         da = LinearDiscriminantAnalysis()
-
-    da.fit(X,y)
+    if (validation):
+        ntest=np.floor(len(y)//10).astype(int)
+        per=np.random.permutation(len(y))
+        lt,la=per[:ntest], per[ntest:]
+            
+        # définition de l'ensemble d'apprentissage et de test
+        Xa,Xt=Xcopy[la,:],Xcopy[lt,:] 
+        ya,yt=ycopy[la],ycopy[lt] 
+        da.fit(Xa,ya)
+    else:    
+        da.fit(X,y)
     plt.rcParams.update({'figure.figsize': (3,3),'font.size': 10})
     plot_confusion_matrix(da, X, y, cmap='YlOrBr', colorbar=False)  
     plt.rcdefaults() 
