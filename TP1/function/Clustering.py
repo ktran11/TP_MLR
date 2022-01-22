@@ -50,7 +50,7 @@ def Visualisation_CAH(X, y, method = 'ward', metric = 'euclidian', seuil = 10, s
     plt.title('CAH. Visualisation des classes au seuil de ' + str(seuil))
     d = dendrogram(M,labels = list(y), 
                    orientation = 'right', 
-                   color_threshold = s)
+                   color_threshold = seuil)
     #print(np.round(M[:,2],2))
 
 def groupes(X, y, s):
@@ -104,7 +104,7 @@ def intraclasse(X, y):
         plt.ylabel("Variance intraclasse/variance totale")
 
 
-def Kmeans(X, y,  n_init = 10, stand = False, val = False, n = 10):
+def Kmeans_func(X, y,  n_init = 10, stand = False, val = False, n = 10):
     """
     Algorithme des K moyennes, taux d'erreurs et matrice de confusion
 
@@ -127,13 +127,16 @@ def Kmeans(X, y,  n_init = 10, stand = False, val = False, n = 10):
     None.
 
     """
-    nclus = len(set(y))
+    y_label = list(set(y))
+    print(y_label)
+    nclus = len(y_label)
     Xcopy = X.copy()
     ycopy = y.copy()
     if (stand):
         Xcopy = StandardScaler().fit_transform(Xcopy)    
     
     k_means = KMeans(init = 'k-means++', n_clusters = nclus, n_init = n_init)
+    k_means.label_ = y_label
     if (val):
         err = 0
         for i in range (n):
@@ -156,20 +159,22 @@ def Kmeans(X, y,  n_init = 10, stand = False, val = False, n = 10):
         print("Taux d'erreur : ",round(errm,3))
     else: 
         k_means.fit(X)
-        yhat = k_means.predict(X) 
+        yhat = k_means.predict(X)
+        print(y,yhat)
         errl = sum(y != yhat) / len(y)
         print("Taux d'erreur: ", round(errl , 3))    
-
+"""
         # Matrice de confusion
         # Rq: La matrice fournie par confusion_matrix est carrée:
-        #    On retire les lignes de zeros de conf_mat, dues au fait qu'il peut y avoir plus de classes que d'etiquettes
-        #    Et de meme avec les colonnes s'il y a moins de classes
+        #    On retire les lignes de zeros de conf_mat, dues au fait 
+        #    qu'il peut y avoir plus de classes que d'etiquettes
+        #    et de meme avec les colonnes s'il y a moins de classes
         conf_mat =  confusion_matrix(y, yhat)
         conf_mat=conf_mat[np.sum(conf_mat,axis=1)>0,:]
         conf_mat=conf_mat[:,np.sum(conf_mat,axis=0)>0]
         print("Matrice de confusion:")
         print("   Une ligne = un digit\n   Une colonne = un cluster\n")
-        print(conf_mat) 
+        print(conf_mat) """
 
 
     
