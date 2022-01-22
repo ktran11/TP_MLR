@@ -83,11 +83,11 @@ def Matrice_confusion(X, y, quadratic = False):
 
     da.fit(X,y)
     plt.rcParams.update({'figure.figsize': (3,3),'font.size': 16})
-    plot_confusion_matrix(lda, X, y, cmap='YlOrBr', colorbar=False)  
+    plot_confusion_matrix(da, X, y, cmap='YlOrBr', colorbar=False)  
     plt.rcdefaults() 
 
 
-def Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 1, quadratic = False):
+def Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 1):
     """
     Crée un nuage de points sur les composantes principales données par l'analyse discriminante
 
@@ -99,6 +99,7 @@ def Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 1, quadratic = 
         axe des abscisses = composante principale index1. The default is 0.
     index2: INT, optional
         axe des ordonnées = composante principale index2. The default is 1.
+ 
     Returns
     -------
     None.
@@ -110,6 +111,7 @@ def Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 1, quadratic = 
         da = LinearDiscriminantAnalysis()
 
     C = da.fit_transform(X, y)
+    print(C.shape)
     plt.figure()
     vlab = np.unique(y)
     for i, vl in enumerate(vlab):
