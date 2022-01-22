@@ -38,6 +38,7 @@ def Taux_erreur_analyse_discriminante(X, y, quadratic = False, validation = Fals
     Xcopy = X.copy()
     ycopy = y.copy()
     if (validation):
+        err_array = []
         err = 0
         for i in range (n):
             # on prend 1/10 de l'ensemble pour réduire le nombre d'erreurs
@@ -53,16 +54,20 @@ def Taux_erreur_analyse_discriminante(X, y, quadratic = False, validation = Fals
             
             da.fit(Xa,ya)
             yhat = da.predict(Xt)      
-            
-            err += sum(yt != yhat)
-        errm = err /n /len(yt)
+            errx = sum(yt != yhat)/len(yt)
+            err_array += [errx]
+            err += errx
+        errm = err /n 
         print("Taux d'erreur : ",round(errm,3))
+        return errm, err_array
     else: 
         da.fit(X,y)
         yhat = da.predict(X) 
         errl = sum(y != yhat) / len(y)
         print("Taux d'erreur: ", round(errl , 3))
-
+        return errl
+    
+    
 def Matrice_confusion_analyse_discriminante(X, y, quadratic = False, validation = False):
     """
     Matrice de confusion pour l'analyse discriminante 

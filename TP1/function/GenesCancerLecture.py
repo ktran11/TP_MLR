@@ -1,5 +1,7 @@
 import ACP
-
+import AnalyseDiscriminante as ad
+import Clustering as cl
+import matplotlib.pyplot as plt
 import numpy as np 
 
 labels=None
@@ -36,9 +38,28 @@ ACP.Inertie(D)
 C,A,svd = ACP.ACP_func(X,True) # avec standardisation
 U, D, VT = svd
 ACP.Inertie(D)
+r,k = ACP.nbr_comp_inert(D,90)
+
 print("nombre de composantes à prendre pour retrouver 90% de l'information : ",
-      ACP.nbr_comp_inert(D,90))
+      k)
 
-X = X[:,:ACP.nbr_comp_inert(D,90)[1]]
+X = X[:,:k]
 
-
+X.shape
+y
+### Analyse Discriminante
+n = 100
+errl = ad.Taux_erreur_analyse_discriminante(X,y,n=n)
+errq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True,n=n)
+errqv, barq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True,validation=True,n=n)
+errlv, barl = ad.Taux_erreur_analyse_discriminante(X,y,validation=True,n=n)
+errl
+errq
+errqv
+errlv
+barl
+# Barplot
+plt.figure()
+plt.boxplot(barq)
+plt.figure()
+plt.boxplot(barl)
