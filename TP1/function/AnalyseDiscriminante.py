@@ -83,7 +83,7 @@ def Matrice_confusion(X, y, quadratic = False):
 
     da.fit(X,y)
     plt.rcParams.update({'figure.figsize': (3,3),'font.size': 16})
-    plot_confusion_matrix(lda, X, y, cmap='YlOrBr', colorbar=False)  
+    plot_confusion_matrix(da, X, y, cmap='YlOrBr', colorbar=False)  
     plt.rcdefaults() 
 
 
