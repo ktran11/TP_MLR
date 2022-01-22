@@ -7,53 +7,64 @@ Created on Sat Jan 22 11:00:28 2022
 """
 import numpy as np
 import matplotlib.pyplot as plt
-# Analyse discriminante linéaire ----------------------------------------------
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import plot_confusion_matrix
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
-def lineaire(X,y,validation = False):
+def Analyse_discriminante(X, y, quadratic = False, validation = False, n = 10):
     """
-    Analyse discriminante linéaire
+    Analyse discriminante, taux d'erreur
 
     Parameters
     ----------
     X : DONNÉES.
     y : LABELS.
+    quadratic = BOOLÉEN, optional
+        True si analyse discriminant quadratique. The default is False.
     validation : BOOLÉEN, optional
         True si analyse avec validation croisée. The default is False.
-
+    n : INT, optional
+        Si validation est True alors le nombre d'itération est n.
     Returns
     -------
-    Taux d'erreur.
+    None
 
     """
-    lda = LinearDiscriminantAnalysis()
+    if (quadratic):
+        da = QuadraticDiscriminantAnalysis()
+    else:
+        da = LinearDiscriminantAnalysis()
     Xcopy = X.copy()
     ycopy = y.copy()
     if (validation):
-        X = Xcopy
-        y = ycopy
         err = 0
-        for i in range (10):
-            ntest=np.floor(len(y)//10).astype(int)#on prend 1/10 de l'ensemble pour réduire le nombre d'erreurs
+        for i in range (n):
+            # on prend 1/10 de l'ensemble pour réduire le nombre d'erreurs
+            ntest=np.floor(len(y)//10).astype(int)
+            
+            # mélange l'ensemble des données et la labels
             per=np.random.permutation(len(y))
             lt,la=per[:ntest], per[ntest:]
-            Xa,Xt=X[la,:],X[lt,:] 
-            ya,yt=y[la],y[lt] 
-            lda.fit(Xa,ya)
-            yhat = lda.predict(Xt)      
-            errl=sum(yt!=yhat)/len(yt)
-            err += errl
-        errm = err / 10
-        return("Taux d'erreur : ",round(errm,3))
-    lda.fit(X,y)
-    yhat = lda.predict(X) 
-    errl=sum(y!=yhat)/len(y)
-    return("Taux d'erreur: ",round(errl,3))
+            
+            # définition de l'ensemble d'apprentissage et de test
+            Xa,Xt=Xcopy[la,:],Xcopy[lt,:] 
+            ya,yt=ycopy[la],ycopy[lt] 
+            
+            da.fit(Xa,ya)
+            yhat = da.predict(Xt)      
+            
+            err += sum(yt != yhat)
+        errm = err /n /len(yt)
+        print("Taux d'erreur : ",round(errm,3))
+    else: 
+        da.fit(X,y)
+        yhat = da.predict(X) 
+        errl = sum(y != yhat) / len(y)
+        print("Taux d'erreur: ", round(errl , 3))
 
-def confusion_lineaire(X,y):
+def Matrice_confusion(X, y, quadratic = False):
     """
-    matrice de confusion pour l'analyse discriminante linéaire
+    Matrice de confusion pour l'analyse discriminante 
 
     Parameters
     ----------
@@ -65,95 +76,43 @@ def confusion_lineaire(X,y):
     None.
 
     """
-    lda = LinearDiscriminantAnalysis()
-    lda.fit(X,y)
+    if (quadratic):
+        da = QuadraticDiscriminantAnalysis()
+    else:
+        da = LinearDiscriminantAnalysis()
+
+    da.fit(X,y)
     plt.rcParams.update({'figure.figsize': (3,3),'font.size': 16})
-    plot_confusion_matrix(lda, X, y,cmap='YlOrBr',colorbar=False)  
+    plot_confusion_matrix(lda, X, y, cmap='YlOrBr', colorbar=False)  
     plt.rcdefaults() 
 
-def classes_lineaire(X,y):
+
+def Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 1, quadratic = False):
     """
-    
+    Crée un nuage de points sur les composantes principales données par l'analyse discriminante
 
     Parameters
     ----------
     X : DONNÉES.
     y : LABELS.
-
+    index1: INT, optional
+        axe des abscisses = composante principale index1. The default is 0.
+    index2: INT, optional
+        axe des ordonnées = composante principale index2. The default is 1.
     Returns
     -------
     None.
 
     """
-    lda = LinearDiscriminantAnalysis()
-    C = lda.fit_transform(X, y)
+    if (quadratic):
+        da = QuadraticDiscriminantAnalysis()
+    else:
+        da = LinearDiscriminantAnalysis()
+
+    C = da.fit_transform(X, y)
     plt.figure()
     vlab = np.unique(y)
     for i, vl in enumerate(vlab):
         l = (y == vl)
-        plt.scatter(C[l, 0], C[l, 1], s = 4, label = vl)
+        plt.scatter(C[l, index1], C[l, index2], s = 4, label = vl)
         plt.legend()
-    
-
-# Analyse discriminante quadratique ----------------------------------------------
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-def quadratique(X,y,validation = False):
-    """
-    Analyse discriminante quadratique
-
-    Parameters
-    ----------
-    X : DONNÉES.
-    y : LABELS.
-    validation : BOOLÉEN, optional
-        True si analyse avec validation croisée. The default is False.
-
-    Returns
-    -------
-    Taux d'erreur.
-
-    """
-    qda = QuadraticDiscriminantAnalysis()
-    Xcopy = X.copy()
-    ycopy = y.copy()
-    if (validation):
-        X = Xcopy
-        y = ycopy
-        err = 0
-        for i in range (10):
-            ntest=np.floor(len(y)//10).astype(int)#on prend 1/10 de l'ensemble pour réduire le nombre d'erreurs
-            per=np.random.permutation(len(y))#permutation des nombres de 1 à 400
-            lt,la=per[:ntest], per[ntest:]#lt = indices des premiers éléments entre 1 et 400 et la des derniers
-            Xa,Xt=X[la,:],X[lt,:] 
-            ya,yt=y[la],y[lt] 
-            qda.fit(Xa,ya)
-            yhat = qda.predict(Xt)      
-            errl=sum(yt!=yhat)/len(yt)
-            err += errl
-        errm = err / 10
-        return("Taux d'erreur : ",round(errm,3))
-    qda.fit(X,y) # estimation
-    yhat = qda.predict(X) #prédiction
-    errl=sum(y!=yhat)/len(y) #somme des erreurs divisé par la longueur
-    return("Taux d'erreur: ",round(errl,3)) #on imprime le taux d'erreur (on se trompe environ 1 fois sur 4) 
-
-def confusion_quadratique(X,y):
-    """
-    matrice de confusion pour l'analyse discriminante quadratique
-
-    Parameters
-    ----------
-    X : DONNÉES.
-    y : LABELS.
-
-    Returns
-    -------
-    None.
-
-    """
-    qda = QuadraticDiscriminantAnalysis()
-    qda.fit(X,y)
-    plt.rcParams.update({'figure.figsize': (3,3),'font.size': 16})#changement des tailles des caractères
-    plot_confusion_matrix(qda, X, y,cmap='YlOrBr',colorbar=False)  #cmap = colormap, colorbar pour avoir l'échelle
-    plt.rcdefaults() 
-
