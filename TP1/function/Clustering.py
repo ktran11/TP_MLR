@@ -53,56 +53,16 @@ def Visualisation_CAH(X, y, method = 'ward', metric = 'euclidian', seuil = 10, s
                    color_threshold = seuil)
     #print(np.round(M[:,2],2))
 
-def groupes(X, y, s):
-    """
-    Récupération des groupes
-
-    Parameters
-    ----------
-    X : DONNÉES.
-    y : LABELS.
-    s : SEUIL.
-
-    Returns
-    -------
-    None.
-
-    """
-    X = StandardScaler().fit_transform(X)
-    M = linkage(X, method = 'ward', metric = 'euclidean')
-    groupes = fcluster(M, t = s, criterion = 'distance')
-    for k in range(1, np.max(groupes) + 1):
-        print('Classe ' + str(k).ljust(3, ' ') + ': ', end = '')
-        print(*y[np.where(groupes==k)])
-
-def intraclasse(X, y):
-    """
-    Décroissance des variances intraclasse
-
-    Parameters
-    ----------
-    X : DONNÉES.
-    y : LABELS.
-
-    Returns
-    -------
-    None.
-
-    """
-    X = StandardScaler().fit_transform(X)
-    M = linkage(X,method = 'ward', metric = 'euclidean')
-    VI = np.cumsum(M[:,2] ** 2) / 2
-    plt.figure()
-    plt.plot(np.arange(len(VI)) + 1, np.flip(VI, axis = 0))
-    plt.xlabel("Nombre de classes")
-    plt.ylabel("Variance intraclasse")
-    
-    if False: # Autre figure possible
-        plt.figure()
-        plt.plot(np.arange(len(VI/max(VI)))+1,np.flip(VI/max(VI),axis=0))
-        plt.xlabel("Nombre de classes")
-        plt.ylabel("Variance intraclasse/variance totale")
-
+def BarPlotMat(M):
+    # Fait un barplot pour chaque colonne de M.
+    # La couleur correspond à l'indice, la hauteur à la valeur
+    I = M.shape[0]
+    J = M.shape[1]
+    ind = np.arange(J)
+    haut = 0 * M[0,:]
+    for i in range(I):
+        plt.bar(ind,M[i,:],bottom=haut,color=plt.cm.inferno(i/(I-1)))
+        haut += M[i,:]
 
 def Kmeans_func(X, y,  n_init = 10, stand = False, val = False, n = 10):
     """
@@ -127,79 +87,39 @@ def Kmeans_func(X, y,  n_init = 10, stand = False, val = False, n = 10):
     None.
 
     """
-    y_label = list(set(y))
-    print(y_label)
-    nclus = len(y_label)
+
     Xcopy = X.copy()
     ycopy = y.copy()
+    y_label = list(set(ycopy))
+    nclus = len(y_label)
+      
+    for i in range(nclus):
+        ycopy[ycopy == y_label[i]] = i
+    
+    ycopy = ycopy.astype(int)
+
     if (stand):
-        Xcopy = StandardScaler().fit_transform(Xcopy)    
+        Xcopy = StandardScaler().fit_transform(Xcopy)  
+        
     
     k_means = KMeans(init = 'k-means++', n_clusters = nclus, n_init = n_init)
-    k_means.label_ = y_label
-    if (val):
-        err = 0
-        for i in range (n):
-            # on prend 1/10 de l'ensemble pour réduire le nombre d'erreurs
-            ntest = np.floor(len(y)//10).astype(int)
-
-            # mélange l'ensemble des données et la labels
-            per = np.random.permutation(len(y))
-            lt,la = per[:ntest], per[ntest:]
-
-            # définition de l'ensemble d'apprentissage et de test
-            Xa,Xt = Xcopy[la,:],Xcopy[lt,:] 
-            ya,yt = ycopy[la],ycopy[lt] 
-
-            k_means.fit(Xa)
-            yhat = k_means.predict(Xt)      
-
-            err += sum(yt != yhat)
-        errm = err /n /len(yt)
-        print("Taux d'erreur : ",round(errm,3))
-    else: 
-        k_means.fit(X)
-        yhat = k_means.predict(X)
-        print(y,yhat)
-        errl = sum(y != yhat) / len(y)
-        print("Taux d'erreur: ", round(errl , 3))    
-"""
-        # Matrice de confusion
-        # Rq: La matrice fournie par confusion_matrix est carrée:
-        #    On retire les lignes de zeros de conf_mat, dues au fait 
-        #    qu'il peut y avoir plus de classes que d'etiquettes
-        #    et de meme avec les colonnes s'il y a moins de classes
-        conf_mat =  confusion_matrix(y, yhat)
-        conf_mat=conf_mat[np.sum(conf_mat,axis=1)>0,:]
-        conf_mat=conf_mat[:,np.sum(conf_mat,axis=0)>0]
-        print("Matrice de confusion:")
-        print("   Une ligne = un digit\n   Une colonne = un cluster\n")
-        print(conf_mat) """
-
-
-    
-def comparaisons_inerties(X, y, s):
-    """
-    Comparaison des inerties Kmeans et CAH
-
-    Parameters
-    ----------
-    X : DONNÉES.
-    y : LABELS.
-    stand : BOOLEEN, optional
-        Standardise si True. The default is False
-    Returns
-    -------
-    None.
-
-    """
-    
-    X = StandardScaler().fit_transform(X)
-    M = linkage(X, method = 'ward', metric = 'euclidean')
-    groupes = fcluster(M, t = s, criterion = 'distance')
-    nclus = np.max(groupes)
-    VI = np.cumsum(M[:,2] ** 2) / 2
-    k_means = KMeans(init = 'k-means++', n_clusters = nclus, n_init = 10)
     k_means.fit(X)
-    print("Inertie Kmeans", nclus, "centres: ", k_means.inertia_)
-    print("Inertie CAH", nclus, "classes: ", VI[-nclus])
+    yhat = k_means.predict(X)
+    # Matrice de confusion
+    # Rq: La matrice fournie par confusion_matrix est carrée:
+    #    On retire les lignes de zeros de conf_mat, dues au fait qu'il peut y avoir plus de classes que d'etiquettes
+    #    Et de meme avec les colonnes s'il y a moins de classes
+    conf_mat =  confusion_matrix(ycopy,yhat)
+    conf_mat=conf_mat[np.sum(conf_mat,axis=1)>0,:]
+    conf_mat=conf_mat[:,np.sum(conf_mat,axis=0)>0]
+    print("Matrice de confusion:")
+    print("   Une ligne = une maladie\n   Une colonne = un cluster\n")
+    print(conf_mat)
+    plt.figure(figsize = [8,5])
+    BarPlotMat(conf_mat)
+    plt.xlabel('Classe')
+    plt.ylabel('Répartition des étiquettes')
+    plt.title('Répartition dans chaque classe')
+    plt.legend(y_label)
+
+

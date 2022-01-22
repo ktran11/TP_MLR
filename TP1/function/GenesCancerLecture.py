@@ -42,4 +42,3 @@ print("nombre de composantes à prendre pour retrouver 90% de l'information : ",
 X = X[:,:ACP.nbr_comp_inert(D,90)[1]]
 
 
-
