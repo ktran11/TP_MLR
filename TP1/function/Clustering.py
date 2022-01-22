@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
 from sklearn.cluster import  KMeans
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix
 
 # Classification Ascendante hiérarchique --------------------------------------------
 
@@ -103,7 +104,7 @@ def intraclasse(X, y):
         plt.ylabel("Variance intraclasse/variance totale")
 
 
-def Kmeans(X, y,  n_init = 10, stand = False, val = False):
+def Kmeans(X, y,  n_init = 10, stand = False, val = False, n = 10):
     """
     Algorithme des K moyennes, taux d'erreurs et matrice de confusion
 
@@ -119,7 +120,8 @@ def Kmeans(X, y,  n_init = 10, stand = False, val = False):
         Standardisation si True. The default is False.
     val : booleen, optional
         Validation croisée si True. The default is False.
-
+    n : int, optional
+        nombre d'itération. The default is 10.
     Returns
     -------
     None.
@@ -132,7 +134,7 @@ def Kmeans(X, y,  n_init = 10, stand = False, val = False):
         Xcopy = StandardScaler().fit_transform(Xcopy)    
     
     k_means = KMeans(init = 'k-means++', n_clusters = nclus, n_init = n_init)
-    if (validation):
+    if (val):
         err = 0
         for i in range (n):
             # on prend 1/10 de l'ensemble pour réduire le nombre d'erreurs
@@ -162,7 +164,7 @@ def Kmeans(X, y,  n_init = 10, stand = False, val = False):
         # Rq: La matrice fournie par confusion_matrix est carrée:
         #    On retire les lignes de zeros de conf_mat, dues au fait qu'il peut y avoir plus de classes que d'etiquettes
         #    Et de meme avec les colonnes s'il y a moins de classes
-        conf_mat =  confusion_matrix(labels,cl)
+        conf_mat =  confusion_matrix(y, yhat)
         conf_mat=conf_mat[np.sum(conf_mat,axis=1)>0,:]
         conf_mat=conf_mat[:,np.sum(conf_mat,axis=0)>0]
         print("Matrice de confusion:")
