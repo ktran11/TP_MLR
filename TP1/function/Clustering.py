@@ -73,7 +73,7 @@ def Visualisation_CAH(X, y, method = 'ward', metric = 'euclidian', seuil = 10, s
     return M
 
 
-def Kmeans(X, y,  n_init = 10, stand = False, val = False):
+def Kmeans(X, y,  n_init = 10, stand = False, val = False, n = 10):
     """
     Algorithme des K moyennes, taux d'erreurs et matrice de confusion
 
@@ -89,7 +89,8 @@ def Kmeans(X, y,  n_init = 10, stand = False, val = False):
         Standardisation si True. The default is False.
     val : booleen, optional
         Validation croisée si True. The default is False.
-
+    n : int, optional
+        nombre d'itération. The default is 10.
     Returns
     -------
     None.
@@ -102,7 +103,7 @@ def Kmeans(X, y,  n_init = 10, stand = False, val = False):
         Xcopy = StandardScaler().fit_transform(Xcopy)    
     
     k_means = KMeans(init = 'k-means++', n_clusters = nclus, n_init = n_init)
-    if (validation):
+    if (val):
         err = 0
         for i in range (n):
             # on prend 1/10 de l'ensemble pour réduire le nombre d'erreurs
