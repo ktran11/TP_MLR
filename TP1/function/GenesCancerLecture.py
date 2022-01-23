@@ -43,23 +43,42 @@ r,k = ACP.nbr_comp_inert(D,90)
 print("nombre de composantes à prendre pour retrouver 90% de l'information : ",
       k)
 
-X = X[:,:k]
+X = C[:,:k]
 
-X.shape
-y
+print(X.shape)
+print(y)
 ### Analyse Discriminante
 n = 100
-errl = ad.Taux_erreur_analyse_discriminante(X,y,n=n)
-errq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True,n=n)
+errl = ad.Taux_erreur_analyse_discriminante(X,y)
+errq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True)
 errqv, barq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True,validation=True,n=n)
 errlv, barl = ad.Taux_erreur_analyse_discriminante(X,y,validation=True,n=n)
-errl
-errq
-errqv
-errlv
-barl
+print("taux d'erreur analyse discriminante linéaire: ", errl)
+print("taux d'erreur analyse discriminante quadratique: ", errq)
+print("taux d'erreur analyse discriminante quadratique avec validation: ", errqv)
+print("taux d'erreur analyse discriminante linéaire avec validation: ", errlv)
 # Barplot
 plt.figure()
 plt.boxplot(barq)
 plt.figure()
 plt.boxplot(barl)
+#Matrice de confusion
+matl = ad.Matrice_confusion_analyse_discriminante(X, y, title = 'AD linéaire')
+matq = ad.Matrice_confusion_analyse_discriminante(X, y, quadratic = True, 
+                                                  title = 'AD quadratique')
+matlv = ad.Matrice_confusion_analyse_discriminante(X, y, validation = True, 
+                                                   title = 'AD linéaire avec validation')
+matqv = ad.Matrice_confusion_analyse_discriminante(X, y, quadratic = True, 
+                                                   validation = True, 
+                                                   title = 'AD quadratique avec validation')
+matl
+matq
+matlv
+matqv
+#nuage de points
+sc01 = ad.Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 1)
+sc02 = ad.Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 2)
+sc12 = ad.Scatter_plot_analyse_discriminant(X, y, index1 = 1, index2 = 2)
+sc01
+sc02
+sc12

@@ -68,7 +68,7 @@ def Taux_erreur_analyse_discriminante(X, y, quadratic = False, validation = Fals
         return errl
     
     
-def Matrice_confusion_analyse_discriminante(X, y, quadratic = False, validation = False):
+def Matrice_confusion_analyse_discriminante(X, y, quadratic = False, validation = False, title = 'matrice de confusion'):
     """
     Matrice de confusion pour l'analyse discriminante 
 
@@ -80,6 +80,8 @@ def Matrice_confusion_analyse_discriminante(X, y, quadratic = False, validation 
         True si analyse discriminant quadratique. The default is False.
     validation : BOOLÉEN, optional
         True si analyse avec validation croisée. The default is False.
+    title : str, optional
+        titre de la matrice
 
     Returns
     -------
@@ -106,6 +108,7 @@ def Matrice_confusion_analyse_discriminante(X, y, quadratic = False, validation 
     plt.rcParams.update({'figure.figsize': (3,3),'font.size': 10})
     plot_confusion_matrix(da, X, y, cmap='YlOrBr', colorbar=False)  
     plt.rcdefaults() 
+    plt.title(title)
 
 
 def Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 1):
