@@ -63,8 +63,28 @@ def BarPlotMat(M):
     for i in range(I):
         plt.bar(ind,M[i,:],bottom=haut,color=plt.cm.inferno(i/(I-1)))
         haut += M[i,:]
+        
+def calc_errr_Kmeans(M):
+    """
+    Calcul le taux d'erreur à partir d'une matrice de confusion M
+   
+    Parameters
+    ----------
+    M : ndarray
+        Matrice de confusion.
 
-def Kmeans_func(X, y,  n_init = 10, stand = False, val = False, n = 10):
+    Returns
+    -------
+    float
+        taux d'erreur.
+
+    """
+    res = 0.
+    for i in M:
+        res += np.sum(i) - i.max()
+    return round(res/M.sum(),3)
+
+def Kmeans_func(X, y,  n_init = 10, val = False, n = 10):
     """
     Algorithme des K moyennes, taux d'erreurs et matrice de confusion
 
@@ -80,8 +100,7 @@ def Kmeans_func(X, y,  n_init = 10, stand = False, val = False, n = 10):
         Standardisation si True. The default is False.
     val : booleen, optional
         Validation croisée si True. The default is False.
-    n : int, optional
-        nombre d'itération. The default is 10.
+ 
     Returns
     -------
     None.
@@ -97,29 +116,66 @@ def Kmeans_func(X, y,  n_init = 10, stand = False, val = False, n = 10):
         ycopy[ycopy == y_label[i]] = i
     
     ycopy = ycopy.astype(int)
-
-    if (stand):
-        Xcopy = StandardScaler().fit_transform(Xcopy)  
-        
-    
     k_means = KMeans(init = 'k-means++', n_clusters = nclus, n_init = n_init)
-    k_means.fit(X)
-    yhat = k_means.predict(X)
+
+    if (val):
+        err_array = []
+        err = 0
+        for i in range(n):
+            
+            # on prend 1/10 de l'ensemble pour réduire le nombre d'erreurs
+            ntest=np.floor(len(y)//2).astype(int)
+            
+            # mélange l'ensemble des données et la labels
+            per=np.random.permutation(len(y))
+            lt,la=per[:ntest], per[ntest:]
+            
+            # définition de l'ensemble d'apprentissage et de test
+            Xa,Xt=Xcopy[la,:],Xcopy[lt,:] 
+            ya,yt=ycopy[la],ycopy[lt] 
+            
+            k_means.fit(Xa,ya)
+            yhat = k_means.predict(Xt)
+            conf_mat =  confusion_matrix(yt,yhat)
+
+            errx = calc_errr_Kmeans(conf_mat) 
+            err_array += [errx]
+            err += errx
+        err = err /n 
+            
+        conf_mat =  confusion_matrix(yt,yhat)
+        conf_mat=conf_mat[np.sum(conf_mat,axis=1)>0,:]
+        conf_mat=conf_mat[:,np.sum(conf_mat,axis=0)>0]
+        print("Matrice de confusion:")
+        print("   Une ligne = une maladie\n   Une colonne = un cluster\n")
+        print(conf_mat)
+        plt.figure(figsize = [8,5])
+        BarPlotMat(conf_mat)
+        plt.xlabel('Classe')
+        plt.ylabel('Répartition des étiquettes')
+        plt.title('Répartition dans chaque classe')
+        plt.legend(y_label)
+        return err, err_array
+
+    else:
+    
+        k_means.fit(Xcopy)
+        yhat = k_means.predict(Xcopy)
     # Matrice de confusion
     # Rq: La matrice fournie par confusion_matrix est carrée:
     #    On retire les lignes de zeros de conf_mat, dues au fait qu'il peut y avoir plus de classes que d'etiquettes
     #    Et de meme avec les colonnes s'il y a moins de classes
-    conf_mat =  confusion_matrix(ycopy,yhat)
-    conf_mat=conf_mat[np.sum(conf_mat,axis=1)>0,:]
-    conf_mat=conf_mat[:,np.sum(conf_mat,axis=0)>0]
-    print("Matrice de confusion:")
-    print("   Une ligne = une maladie\n   Une colonne = un cluster\n")
-    print(conf_mat)
-    plt.figure(figsize = [8,5])
-    BarPlotMat(conf_mat)
-    plt.xlabel('Classe')
-    plt.ylabel('Répartition des étiquettes')
-    plt.title('Répartition dans chaque classe')
-    plt.legend(y_label)
+        conf_mat =  confusion_matrix(ycopy,yhat)
+        conf_mat=conf_mat[np.sum(conf_mat,axis=1)>0,:]
+        conf_mat=conf_mat[:,np.sum(conf_mat,axis=0)>0]
+        print("Matrice de confusion:")
+        print("   Une ligne = une maladie\n   Une colonne = un cluster\n")
+        print(conf_mat)
+        plt.figure(figsize = [8,5])
+        BarPlotMat(conf_mat)
+        plt.xlabel('Classe')
+        plt.ylabel('Répartition des étiquettes')
+        plt.title('Répartition dans chaque classe')
+        plt.legend(y_label)
 
 

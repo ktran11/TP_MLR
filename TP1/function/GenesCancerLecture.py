@@ -1,6 +1,5 @@
 import ACP
 import AnalyseDiscriminante as ad
-import Clustering as cl
 import matplotlib.pyplot as plt
 import numpy as np 
 
@@ -43,23 +42,46 @@ r,k = ACP.nbr_comp_inert(D,90)
 print("nombre de composantes à prendre pour retrouver 90% de l'information : ",
       k)
 
-X = X[:,:k]
 
-X.shape
-y
+### Scatter plot ACP
+vlab = list(set(y))
+for i,vl in enumerate(vlab):
+   l=y==vl
+   plt.scatter(C[l,1], C[l,2], s = 4, label = vl)
+   plt.legend()
+
+
+
+X = C[:,:k]
+
 ### Analyse Discriminante
-n = 100
+n = 500
 errl = ad.Taux_erreur_analyse_discriminante(X,y,n=n)
 errq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True,n=n)
 errqv, barq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True,validation=True,n=n)
 errlv, barl = ad.Taux_erreur_analyse_discriminante(X,y,validation=True,n=n)
-errl
-errq
-errqv
-errlv
-barl
+
+
+
+### Clustering
+import Clustering as cl
+n_init = 10
+cl.Kmeans_func(X,y,n_init=n_init)
+errkv,bark = cl.Kmeans_func(X, y,n_init=n_init,val=True, n = 200)
+
+
 # Barplot
 plt.figure()
-plt.boxplot(barq)
-plt.figure()
-plt.boxplot(barl)
+
+barl = np.array(barl)*100
+barq = np.array(barq)*100
+bark = np.array(bark)*100
+
+bar = [bark,barl,barq]
+
+plt.boxplot(bar, labels = ('K-Moyennes','AD Linéaire','AD Quadratique'),positions = np.array([0.3,1.5,2.7]))
+plt.title('Boite à moustache des différentes erreurs pour chaque classification')
+plt.ylabel('Taux d\'erreur en %')
+plt.xlabel('Classification')
+
+
