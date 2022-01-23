@@ -1,4 +1,5 @@
 import ACP
+import Clustering as cl
 import AnalyseDiscriminante as ad
 import matplotlib.pyplot as plt
 import numpy as np 
@@ -45,6 +46,7 @@ print("nombre de composantes à prendre pour retrouver 90% de l'information : ",
 
 ### Scatter plot ACP
 vlab = list(set(y))
+plt.figure()
 for i,vl in enumerate(vlab):
    l=y==vl
    plt.scatter(C[l,1], C[l,2], s = 4, label = vl)
@@ -54,20 +56,42 @@ for i,vl in enumerate(vlab):
 
 X = C[:,:k]
 
+### Clustering
+n_init = 10
+errk = cl.Kmeans_func(X,y,n_init = n_init)
+errkv,bark = cl.Kmeans_func(X, y, n_init = n_init,val=True, n = 200)
+
+# Nuage de points, (indice 1 et 2 plus parlant)
+sc12 = cl.Scatter_plot_k_means(X,y,index1=1,index2=2)
+sc12
+
+
 ### Analyse Discriminante
-n = 500
-errl = ad.Taux_erreur_analyse_discriminante(X,y,n=n)
-errq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True,n=n)
+n = 100
+errl = ad.Taux_erreur_analyse_discriminante(X,y)
+errq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True)
 errqv, barq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True,validation=True,n=n)
 errlv, barl = ad.Taux_erreur_analyse_discriminante(X,y,validation=True,n=n)
 
+# Matrice de confusion
+matl = ad.Matrice_confusion_analyse_discriminante(X, y, title = 'AD linéaire')
+matq = ad.Matrice_confusion_analyse_discriminante(X, y, quadratic = True, 
+                                                  title = 'AD quadratique')
+matlv = ad.Matrice_confusion_analyse_discriminante(X, y, validation = True, 
+                                                   title = 'AD linéaire avec validation')
+matqv = ad.Matrice_confusion_analyse_discriminante(X, y, quadratic = True, 
+                                                   validation = True, 
+                                                   title = 'AD quadratique avec validation')
+matl
+matq
+matlv
+matqv
 
+#nuage de points
 
-### Clustering
-import Clustering as cl
-n_init = 10
-cl.Kmeans_func(X,y,n_init=n_init)
-errkv,bark = cl.Kmeans_func(X, y,n_init=n_init,val=True, n = 200)
+sc12 = ad.Scatter_plot_analyse_discriminant(X, y, index1 = 1, index2 = 2)
+
+sc12
 
 
 # Barplot
@@ -84,43 +108,10 @@ plt.title('Boite à moustache des différentes erreurs pour chaque classificatio
 plt.ylabel('Taux d\'erreur en %')
 plt.xlabel('Classification')
 
-
-X = C[:,:k]
-
-print(X.shape)
-print(y)
-### Analyse Discriminante
-n = 100
-errl = ad.Taux_erreur_analyse_discriminante(X,y)
-errq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True)
-errqv, barq = ad.Taux_erreur_analyse_discriminante(X,y,quadratic=True,validation=True,n=n)
-errlv, barl = ad.Taux_erreur_analyse_discriminante(X,y,validation=True,n=n)
+# Taux d'erreur
+print("taux d'erreur k-moyennes: ", errk)
 print("taux d'erreur analyse discriminante linéaire: ", errl)
 print("taux d'erreur analyse discriminante quadratique: ", errq)
+print("taux d'erreur k-moyennes avec validation: ", errkv)
 print("taux d'erreur analyse discriminante quadratique avec validation: ", errqv)
 print("taux d'erreur analyse discriminante linéaire avec validation: ", errlv)
-# Barplot
-plt.figure()
-plt.boxplot(barq)
-plt.figure()
-plt.boxplot(barl)
-#Matrice de confusion
-matl = ad.Matrice_confusion_analyse_discriminante(X, y, title = 'AD linéaire')
-matq = ad.Matrice_confusion_analyse_discriminante(X, y, quadratic = True, 
-                                                  title = 'AD quadratique')
-matlv = ad.Matrice_confusion_analyse_discriminante(X, y, validation = True, 
-                                                   title = 'AD linéaire avec validation')
-matqv = ad.Matrice_confusion_analyse_discriminante(X, y, quadratic = True, 
-                                                   validation = True, 
-                                                   title = 'AD quadratique avec validation')
-matl
-matq
-matlv
-matqv
-#nuage de points
-sc01 = ad.Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 1)
-sc02 = ad.Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 2)
-sc12 = ad.Scatter_plot_analyse_discriminant(X, y, index1 = 1, index2 = 2)
-sc01
-sc02
-sc12

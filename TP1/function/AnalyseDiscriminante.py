@@ -58,13 +58,11 @@ def Taux_erreur_analyse_discriminante(X, y, quadratic = False, validation = Fals
             err_array += [errx]
             err += errx
         errm = err /n 
-        print("Taux d'erreur : ",round(errm,3))
         return errm, err_array
     else: 
         da.fit(X,y)
         yhat = da.predict(X) 
         errl = sum(y != yhat) / len(y)
-        print("Taux d'erreur: ", round(errl , 3))
         return errl
     
     
@@ -129,9 +127,9 @@ def Scatter_plot_analyse_discriminant(X, y, index1 = 0, index2 = 1):
     None.
 
     """
+    Xcopy, ycopy = X.copy(), y.copy()
     lda = LinearDiscriminantAnalysis()
-    C = lda.fit_transform(X, y)
-    print(C.shape)
+    C = lda.fit_transform(Xcopy, ycopy)
     plt.figure()
     vlab = np.unique(y)
     for i, vl in enumerate(vlab):

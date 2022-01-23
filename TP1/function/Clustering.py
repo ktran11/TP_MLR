@@ -177,5 +177,38 @@ def Kmeans_func(X, y,  n_init = 10, val = False, n = 10):
         plt.ylabel('Répartition des étiquettes')
         plt.title('Répartition dans chaque classe')
         plt.legend(y_label)
+        return calc_errr_Kmeans(conf_mat)
 
 
+
+
+def Scatter_plot_k_means(X, y, index1 = 0, index2 = 1):
+    """
+    Crée un nuage de points sur les composantes principales données par l'analyse discriminante
+
+    Parameters
+    ----------
+    X : DONNÉES.
+    y : LABELS.
+    index1: INT, optional
+        axe des abscisses = composante principale index1. The default is 0.
+    index2: INT, optional
+        axe des ordonnées = composante principale index2. The default is 1.
+ 
+    Returns
+    -------
+    None.
+
+    """
+    Xcopy = X.copy()
+    ycopy = y.copy()
+    y_label = list(set(ycopy))
+    nclus = len(y_label)
+    k_means = KMeans(init = 'k-means++', n_clusters = nclus, n_init = 10)
+    C = k_means.fit_transform(Xcopy, ycopy)
+    plt.figure()
+    vlab = np.unique(y)
+    for i, vl in enumerate(vlab):
+        l = (y == vl)
+        plt.scatter(C[l, index1], C[l, index2], s = 4, label = vl)
+        plt.legend()
