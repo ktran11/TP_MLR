@@ -9,11 +9,7 @@ Created on Mon Dec  7 17:44:34 2020
 
 import numpy as np
 
-# Adresse des deux fichiers de donnees
-# https://perso.univ-rennes1.fr/bernard.delyon/tp/WindSpeed.csv
-# https://perso.univ-rennes1.fr/bernard.delyon/tp/Hs.csv
-
-etudiant = 14003508
+etudiant = 18022495
  # nombre à remplacer par votre numéro d'etudiant
 np.random.seed(etudiant)
 
@@ -28,3 +24,4 @@ select=np.random.choice(n,size=n//8, replace=False)
 X=X[select,:]
 y=y[select]
 n=n=len(y)
+
