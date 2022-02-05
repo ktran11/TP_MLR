@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jan 2 7:51:01 2022
+
+@author: Agathe & Kevin
+"""
+
 import ACP
 import Clustering as cl
 import AnalyseDiscriminante as ad
@@ -8,11 +16,11 @@ labels=None
 indiv=[]
 varbs=None
 
-etudiant = 18022495 # nombre à  remplacer par votre numéro d'etudiant
+etudiant = 18022495 # numéro étudiant d'Agathe
 np.random.seed(etudiant)
 
 # On lit la premiere ligne pour obtenir le nombre de colonnes
-X = np.loadtxt("../data/data.csv",max_rows=1,delimiter=",",dtype=str)
+X = np.loadtxt("data.csv",max_rows=1,delimiter=",",dtype=str)
 nvars=len(X)-1
 
 # Lecture des donnees correpondant aux nvars premieres variables
@@ -20,9 +28,9 @@ nvars=len(X)-1
 
 print("Sont lues les donnees correpondant aux nvars=",nvars,
       "premieres variables et a moitie des individus")
-X = np.loadtxt("../data/data.csv",skiprows=1,delimiter=",",usecols=np.arange(nvars)+1)
+X = np.loadtxt("data.csv",skiprows=1,delimiter=",",usecols=np.arange(nvars)+1)
 
-y =np.loadtxt("../data/labels.csv",delimiter=",",skiprows=1,dtype=str)
+y =np.loadtxt("labels.csv",delimiter=",",skiprows=1,dtype=str)
 
 y = y[:,-1]
 
