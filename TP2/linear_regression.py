@@ -19,16 +19,18 @@ n=len(y)
 
 
 # On extrait un sous-ensemble d'individus
-select=np.random.choice(n,size=3000, replace=False)
+select=np.random.choice(n,size=1000, replace=False)
 X=X[select,:]
 y=y[select]
 n=len(y)
 
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 
 mod = LinearRegression()
 mod.fit(X=X,y=y) #fait le calcul
+print(mod.score(X,y))
 yhat = mod.predict(X)
 sighat = np.sqrt(sum((yhat-y)**2)/len(y))
 plt.close()
@@ -58,8 +60,6 @@ for i in range(it):
   err+=np.mean((yh-yt)**2)
 err = np.sqrt(err/it)
 print('Erreur par CV 1/5 = ',round(err, 2))
-
-
 
 X = np.multiply(X,X)
 

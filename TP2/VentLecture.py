@@ -24,4 +24,3 @@ select=np.random.choice(n,size=n//8, replace=False)
 X=X[select,:]
 y=y[select]
 n=n=len(y)
-
