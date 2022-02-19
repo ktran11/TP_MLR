@@ -6,6 +6,8 @@ Created on Sat Feb  5 10:44:10 2022
 @author: Agathe
 """
 import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 
 
 etudiant = 18022495
@@ -18,83 +20,94 @@ y=np.loadtxt("data/Vagues.csv",delimiter=',',skiprows=1,usecols=1)
 n=len(y)
 
 
+
+
+select=np.random.choice(n,size = 1000, replace=False)
+Xselect = X[select,:]
+yselect = y[select]
+
+mod = LinearRegression()
+mod.fit(X = Xselect ,y = yselect) #fait le calcul
+yhat = mod.predict(Xselect)
+
+plt.close()
+plt.figure()
+plt.plot(yselect, mod.predict(Xselect),'r+')#donne une idée de la variabilité des erreurs
+plt.xlabel('Réponse')
+plt.ylabel("Prédiction")
+
+plt.plot(yselect, yselect, color = 'black')
+plt.title('Droite de regression du modèle X avec 1000 individus')
+   
+# K-Fold
+K = 5
+it_Kfolds = 50
+err_fold = 0.0
+ntest = np.around(len(yselect)/K).astype(int)
+for i in range(it_Kfolds):
+    per = np.random.permutation(Xselect.shape[0])
+    lt, la = per[:ntest], per[ntest:]
+    Xa, Xt = Xselect[la,:], Xselect[lt,:]
+    ya, yt = yselect[la], yselect[lt]
+    reg = LinearRegression()
+    reg.fit(Xa,ya)
+    yh=reg.predict(Xt)
+    err_fold += np.mean((yh-yt)**2)
+    err_fold = np.sqrt(err_fold/it_Kfolds)
+
+plt.savefig(fr'./image_rapport/reg_line_mod_X_1000_{int(round(err_fold,2)*100)}.png')
+print(err_fold)
+
+nind = 4000
 # On extrait un sous-ensemble d'individus
-select=np.random.choice(n,size=1000, replace=False)
-X=X[select,:]
-y=y[select]
-n=len(y)
-
-import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-
-mod = LinearRegression()
-mod.fit(X=X,y=y) #fait le calcul
-print(mod.score(X,y))
-yhat = mod.predict(X)
-sighat = np.sqrt(sum((yhat-y)**2)/len(y))
-plt.close()
-plt.plot(y,mod.predict(X),'r+')#donne une idée de la variabilité des erreurs
-plt.xlabel('Réponse')
-plt.ylabel("Prédiction")
-plt.plot(y,y, color = 'black')
-plt.title('Droite de regression X 3000 individus')
-plt.show()
+select=np.random.choice(len(y),size=nind, replace=False)
+Xselect = X[select,:]
+yselect = y[select]
+n = len(yselect)
 
 
-#### Calcul de l'erreur par validation croisée
+lineaire_vent = Xselect
+carre_vent = np.multiply(Xselect, Xselect)
+cube_vent = np.multiply(carre_vent, Xselect)
+quatre_vent = np.multiply(carre_vent, carre_vent)
 
+model =  [lineaire_vent, carre_vent, cube_vent, quatre_vent]
+nom_mod = ['X','$X^2$','$X^3$','$X^4$']
+err_fold = np.zeros((len(model)))
 
-# 5-Fold
-err=0
-it=100
-ntest=np.around(len(y)/5).astype(int)
-for i in range(it):
-  per = np.random.permutation(X.shape[0])
-  lt, la = per[:ntest], per[ntest:]
-  Xa, Xt = X[la,:], X[lt,:]
-  ya, yt = y[la], y[lt]
-  reg = LinearRegression()
-  reg.fit(Xa,ya)
-  yh=reg.predict(Xt)
-  err+=np.mean((yh-yt)**2)
-err = np.sqrt(err/it)
-print('Erreur par CV 1/5 = ',round(err, 2))
+it_Kfolds = 50
+K = 5
 
-X = np.multiply(X,X)
+for index, X_mod in enumerate(model): 
+    mod = LinearRegression()
+    mod.fit(X = X_mod ,y = yselect) #fait le calcul
+    yhat = mod.predict(X_mod)
+    sighat = np.sqrt(sum((yhat-yselect)**2)/len(yselect))
+    plt.close()
+    plt.figure()
+    plt.plot(yselect, mod.predict(X_mod),'r+')#donne une idée de la variabilité des erreurs
+    plt.xlabel('Réponse')
+    plt.ylabel("Prédiction")
+    plt.plot(yselect, yselect, color = 'black')
+    plt.title(fr'Droite de regression du modèle {nom_mod[index]} avec {nind} individus')
+    
+    # K-Fold
 
+    ntest = np.around(len(yselect)/K).astype(int)
+    for i in range(it_Kfolds):
+      per = np.random.permutation(X_mod.shape[0])
+      lt, la = per[:ntest], per[ntest:]
+      Xa, Xt = X_mod[la,:], X_mod[lt,:]
+      ya, yt = yselect[la], yselect[lt]
+      reg = LinearRegression()
+      reg.fit(Xa,ya)
+      yh=reg.predict(Xt)
+      err_fold[index] +=np.mean((yh-yt)**2)
+    err_fold[index] = np.sqrt(err_fold[index]/it_Kfolds)
+    plt.savefig(fr'./image_rapport/reg_line_mod_{nom_mod[index]}_{nind}_{int(round(err_fold[index],2)*100)}.png')
 
-
-mod = LinearRegression()
-mod.fit(X=X,y=y) #fait le calcul
-yhat = mod.predict(X)
-sighat = np.sqrt(sum((yhat-y)**2)/len(y))
-plt.close()
-plt.plot(y,mod.predict(X),'r+')#donne une idée de la variabilité des erreurs
-plt.xlabel('Réponse')
-plt.ylabel("Prédiction")
-plt.plot(y,y, color = 'black')
-plt.title('Droite de regression X**2 3000 individus')
-plt.show()
-
-
-#### Calcul de l'erreur par validation croisée
-
-
-# 5-Fold
-err=0
-it=100
-ntest=np.around(len(y)/5).astype(int)
-for i in range(it):
-  per = np.random.permutation(X.shape[0])
-  lt, la = per[:ntest], per[ntest:]
-  Xa, Xt = X[la,:], X[lt,:]
-  ya, yt = y[la], y[lt]
-  reg = LinearRegression()
-  reg.fit(Xa,ya)
-  yh=reg.predict(Xt)
-  err+=np.mean((yh-yt)**2)
-err = np.sqrt(err/it)
-print('Erreur par CV 1/5 = ',round(err, 2))
-
+    
+for index, err in enumerate(err_fold):
+    print(f'Erreur par {K}-folds avec le modèle {nom_mod[index]}: ',round(err, 2))
+    
 
