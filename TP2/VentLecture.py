@@ -5,6 +5,9 @@ Created on Sun Feb  6 14:02:31 2022
 
 @author: Agathe Blanvillain & Kevin Tran
 
+
+ATTENTION, le temps d'exécution peut prendre ~ 10 mins et le programme créer un dossier image_rapport dans lequel il met les images des plot. 
+Il n'y aura pas d'affichage de plot avant la fin de l'exécution.
 """
 
 import numpy as np
@@ -14,7 +17,7 @@ import warnings
 # https://perso.univ-rennes1.fr/bernard.delyon/tp/WindSpeed.csv
 # https://perso.univ-rennes1.fr/bernard.delyon/tp/Hs.csv
 
-warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings('ignore')
 etudiant = 18022495  # nombre à remplacer par votre numéro d'etudiant
 np.random.seed(etudiant)
 
@@ -27,8 +30,8 @@ n=len(y)
 ############################ Regression linéaire ############################
 from sklearn.linear_model import LinearRegression
 
-######### Pour 1000 individus #########
-select=np.random.choice(n,size = 1000, replace=False)
+######### tirage des 1000 individus #########
+select = np.random.choice(n,size = 1000, replace=False)
 Xselect = X[select,:]
 yselect = y[select]
 
@@ -60,7 +63,8 @@ for i in range(it_Kfolds):
 err_fold = np.sqrt(err_fold/it_Kfolds)
 
 plt.savefig(fr'./image_rapport/reg_line_mod_X_1000_{int(round(err_fold,2)*100)}.png')
-print('Erreur par 5-folds avec le modèle X pour 1000 individus :', err_fold)
+
+print('Erreur par 5-folds avec le modèle X pour 1000 individus :', round(err_fold,3))
 
 
 ######### Pour 4000 individus #########
@@ -71,10 +75,10 @@ Xselect = X[select,:]
 yselect = y[select]
 
 
-lineaire_vent = Xselect
-carre_vent = np.multiply(Xselect, Xselect)
-cube_vent = np.multiply(carre_vent, Xselect)
-quatre_vent = np.multiply(carre_vent, carre_vent)
+lineaire_vent = Xselect #X
+carre_vent = np.multiply(Xselect, Xselect) #X²
+cube_vent = np.multiply(carre_vent, Xselect) #X³
+quatre_vent = np.multiply(carre_vent, carre_vent) #X⁴
 
 model =  [lineaire_vent, carre_vent, cube_vent, quatre_vent]
 nom_mod = ['X','$X^2$','$X^3$','$X^4$']
@@ -95,7 +99,6 @@ for index, X_mod in enumerate(model):
     plt.ylabel("Prédiction")
     plt.plot(yselect, yselect, color = 'black')
     plt.title(fr'Droite de regression du modèle {nom_mod[index]} avec {nind} individus')
-    plt.show()
     
     ########## K-Fold #########
     ntest = np.around(len(yselect)/K).astype(int)
@@ -111,9 +114,14 @@ for index, X_mod in enumerate(model):
     err_fold[index] = np.sqrt(err_fold[index]/it_Kfolds)
     plt.savefig(fr'./image_rapport/reg_line_mod_{nom_mod[index]}_{nind}_{int(round(err_fold[index],2)*100)}.png')
 
+
 ######### print rmse #########
 for index, err in enumerate(err_fold):
     print(f'Erreur par {K}-fold avec le modèle {nom_mod[index]}: ', round(err,2))
+    
+    
+    
+################################### Ridge ###################################
 
 ############# Retour 1000 individus #############
 select=np.random.choice(n,size = 1000, replace=False)
@@ -121,34 +129,11 @@ X = X[select,:]
 y = y[select]
 n = len(y)
 
-################################### Ridge ###################################
+### Modèle carré du vent ##
+X = np.multiply(X,X)
+
 from sklearn.linear_model import Ridge
 alphas_Ridge =  10.**np.arange(-1,1,0.1) 
-
-
-######### beta et RMSE contre alpha #########
-norbet=np.zeros(len(alphas_Ridge))
-rmse=np.zeros(len(alphas_Ridge))
-for j,a in enumerate(alphas_Ridge):
-    reg = Ridge(alpha=a,normalize=True)
-    reg.fit(X,y)
-    norbet[j]=np.sqrt(np.sum(reg.coef_**2))
-    rmse[j]=np.sqrt(np.mean((reg.predict(X)-y)**2))
-    yfin = reg.predict(X)
-plt.subplots()
-plt.semilogx()
-plt.xlabel(r'$\alpha$')
-plt.legend()
-plt.title('Ridge. Norme de de beta (rond) et RMSE (croix)')
-plt.plot(alphas_Ridge,norbet,'r')
-plt.plot(alphas_Ridge,norbet,'ro',label=r"$|\beta|$")
-plt.legend(loc='center left')
-plt.twinx()
-plt.plot(alphas_Ridge,rmse,'b')
-plt.plot(alphas_Ridge,rmse,'bx',label="RMSE")
-plt.legend(loc='center right')
-plt.show()
-plt.savefig(r'./image_rapport/$\beta$_RMSE_by_$\alpha$.png')
 
 ######### datasplitting #########
 B = 100
@@ -170,7 +155,6 @@ plt.figure()
 plt.suptitle(r'Ridge. RMSE par validation croisée pour divers $\alpha$.')
 plt.semilogx()
 plt.plot(alphas_Ridge,rmse_datasplitting,alphas_Ridge,rmse_datasplitting,'ro')
-plt.show()
 plt.savefig(r'./image_rapport/Ridge_datasplitting_$\alpha$_RMSE.png')
 
 ######### K folds #########
@@ -194,7 +178,6 @@ plt.figure()
 plt.suptitle(r'Ridge. RMSE par Leave one out pour divers $\alpha$.')
 plt.semilogx()
 plt.plot(alphas_Ridge,rmse_Kfolds,alphas_Ridge,rmse_Kfolds,'ro')
-plt.show()
 plt.savefig(fr'./image_rapport/Ridge_{K}-fold_$\alpha$_RMSE.png')
 
 ######### Comparaison datasplitting et K-fold #########
@@ -210,14 +193,15 @@ plt.plot(alphas_Ridge[rmse_datasplitting.argmin()],min(rmse_datasplitting),'kD',
 plt.xlabel(r'$\alpha$')
 plt.ylabel('RMSE')
 plt.legend()
-plt.show()
 plt.savefig(f'./image_rapport/Ridge_comp_datasplit_{K}-fold.png')
+
+
 
 
 ################################### Lasso ###################################
 from sklearn.linear_model import LassoLars
 
-alphas_Lasso =  10.**np.arange(-4,-1,0.3) 
+alphas_Lasso =  10.**np.arange(-4,-2,0.2) 
 ######### datasplitting #########
 B = 100
 ntest=int(n/2)
@@ -238,7 +222,6 @@ plt.figure()
 plt.suptitle(r'Lasso. RMSE par validation croisée pour divers $\alpha$.')
 plt.semilogx()
 plt.plot(alphas_Lasso,rmse_lasso_dattasplitting,alphas_Lasso,rmse_lasso_dattasplitting,'ro')
-plt.show()
 plt.savefig(r'./image_rapport/Lasso_datasplitting_$\alpha$_RMSE.png')
 
 ######### K fold #########
@@ -264,7 +247,6 @@ plt.figure()
 plt.suptitle(r'Ridge. RMSE par 5-folds pour divers $\alpha$.')
 plt.semilogx()
 plt.plot(alphas_Lasso,rmse_lasso_Kfolds,alphas_Lasso,rmse_lasso_Kfolds,'ro')
-plt.show()
 plt.savefig(fr'./image_rapport/Lasso_{K}-fold_$\alpha$_RMSE.png')
 
 ######### Comparaison datasplitting et K-fold #########
@@ -280,29 +262,34 @@ plt.plot(alphas_Lasso[rmse_lasso_dattasplitting.argmin()],min(rmse_lasso_dattasp
 plt.xlabel(r'$\alpha$')
 plt.ylabel('RMSE')
 plt.legend()
-plt.show()
 plt.savefig(f'./image_rapport/Lasso_comp_datasplit_{K}-fold.png')
 
+
 ######### Nbr de variable non nul contre RMSE #########
-mse = np.zeros(len(alphas_Lasso))
 nco=alphas_Lasso*0.
+ind = rmse_lasso_Kfolds.argmin()
+
 for j,a in enumerate(alphas_Lasso):
   reg = LassoLars(alpha=a,normalize=True)
   reg.fit(X,y)
   nco[j]=sum(abs(reg.coef_)>1.e-16)
   yh = reg.predict(X)
-  mse[j] = np.mean((yh-y)**2)
+plt.figure()
 plt.subplots()
 plt.semilogx()
 plt.title('Lasso. Nb de coeff non nuls (rond) et RMSE (croix)')
 plt.plot(alphas_Lasso,nco,'r')
 plt.plot(alphas_Lasso,nco,'ro',label=r"Nb$\ne$0")
-plt.legend(loc='center left')
+plt.plot(alphas_Lasso[ind],nco[ind],'ko', label= r"Nb$\ne$0 pour argmin(RMSE)")
+plt.legend(loc='upper left')
 plt.twinx()
-plt.plot(alphas_Lasso,rmse,'b')
-plt.plot(alphas_Lasso,rmse,'bx',label="RMSE")
-plt.legend(loc='center right')
+plt.plot(alphas_Lasso,rmse_lasso_Kfolds,'b')
+plt.plot(alphas_Lasso,rmse_lasso_Kfolds,'bx',label="RMSE")
+plt.plot(alphas_Lasso[ind],min(rmse_lasso_Kfolds),'kD',label="min(RMSE)")
+
+plt.legend(loc='upper right')
+
 plt.savefig('./image_rapport/Lasso_nbrvariable_rmse.png')
 
-
+print(f'{int(nco[ind])} coefficients non nuls pour un RMSE de {round(min(rmse_lasso_Kfolds),2)} en {K}-fold')
 
