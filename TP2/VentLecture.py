@@ -22,9 +22,9 @@ etudiant = 18022495  # nombre à remplacer par votre numéro d'etudiant
 np.random.seed(etudiant)
 
 # Lecture des donnees
-nomvar=np.loadtxt("data/Vent.csv",delimiter=',',dtype='str',max_rows=1)[1:]
-X=np.loadtxt("data/Vent.csv",delimiter=',',skiprows=1,usecols=1+np.arange(len(nomvar)))
-y=np.loadtxt("data/Vagues.csv",delimiter=',',skiprows=1,usecols=1)
+nomvar=np.loadtxt("Vent.csv",delimiter=',',dtype='str',max_rows=1)[1:]
+X=np.loadtxt("Vent.csv",delimiter=',',skiprows=1,usecols=1+np.arange(len(nomvar)))
+y=np.loadtxt("Vagues.csv",delimiter=',',skiprows=1,usecols=1)
 n=len(y)
 
 ############################ Regression linéaire ############################
