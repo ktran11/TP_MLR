@@ -27,6 +27,13 @@ X=np.loadtxt("Vent.csv",delimiter=',',skiprows=1,usecols=1+np.arange(len(nomvar)
 y=np.loadtxt("Vagues.csv",delimiter=',',skiprows=1,usecols=1)
 n=len(y)
 
+"""
+# On extrait un sous-ensemble d'individus
+select=np.random.choice(n,size=n//8, replace=False)
+X=X[select,:]
+y=y[select]
+n=n=len(y)
+"""
 ############################ Regression linéaire ############################
 from sklearn.linear_model import LinearRegression
 
@@ -292,4 +299,5 @@ plt.legend(loc='upper right')
 plt.savefig('./image_rapport/Lasso_nbrvariable_rmse.png')
 
 print(f'{int(nco[ind])} coefficients non nuls pour un RMSE de {round(min(rmse_lasso_Kfolds),2)} en {K}-fold')
+
 
